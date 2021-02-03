@@ -1,14 +1,15 @@
 class Bomb
     def initialize(pos)
         @pos = pos
-        @value = 7
+        @value = "_"
         @revealed = false
         @flagged = false
     end
 
     def reveal
-        raise "Flagged tiles cannot be revealed. Unflag first" if @flagged == true
+        return "Flagged tiles cannot be revealed. Unflag first" if @flagged == true
         @revealed = true
+        @value = 8
     end
 
     def exploded?
@@ -18,6 +19,7 @@ class Bomb
 
     def flag
         @flagged = true
+        @value = "F"
     end
 
 
@@ -31,8 +33,10 @@ class Bomb
     end
 
     def inspect
-        {"value" => @value, "exploded?"=>@revealed, "flagged"=> @flagged}
+        {"value" => @value, "pos"=>@pos, "exploded?"=>@revealed, "flagged"=> @flagged}
     end
     def neighbors
+    end
+    def neighbor_bomb_count
     end
 end

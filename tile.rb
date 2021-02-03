@@ -1,51 +1,76 @@
 require_relative "./bomb.rb"
+require "byebug"
 
 class Tile
     attr_accessor :nearby_bombs, :value
     def initialize(pos, board)
-        @pos = pos
-        @value = 0
-        @revealed = false
-        @bombed = false
-        @flagged = false
         @board = board
+        @pos = pos
+        @default_value = nil
+        @value = "_"
+        @revealed = false
+        @flagged = false
+
+
     end
 
 
     def flag
-        @flagged = true
+        if @flagged
+            remove_flag
+        else
+            @flagged = true
+            @default_value = @value
+            @value = "F"
+        end
     end
 
 
     def remove_flag
         @flagged = false
+        @value = @default_value
+
     end
 
     def reveal
-        raise "Flagged tiles cannot be revealed. Unflag first" if @flagged == true
+        return "Flagged tiles cannot be revealed. Unflag first" if @flagged == true
+        return "Already revealed" if @revealed == true
         @revealed = true
+        @value = neighbor_bomb_count
+        return value.to_s
+
     end
 
     def neighbors
+
         immediate_neighbors = []
 
-        left = [@pos[0]-1,@pos[1]]
-        right = [@pos[0]+1,@pos[1]]
-        i = 0
-        while i < 3
+        [-1,0,1].each do |i|
+
             left = [@pos[0]-1,@pos[1]+i]
             mid = [@pos[0], @pos[1]+i]
             right = [@pos[0]+1,@pos[1]+i]
+
+            [left,mid,right].each_with_index do |pos,idx|
+                if pos.any? {|val| val < 0 || val > 8}
+                    pos[0] = @pos[0]
+                    pos[1] = @pos[1]
+                end
+            end
+
+
             immediate_neighbors.push(@board[left], @board[mid], @board[right])
-            i+=1
+
         end
-        p immediate_neighbors
-        immediate_neighbors
+
+        immediate_neighbors.uniq
     end
+
 
     def neighbor_bomb_count
         neigh_arr = neighbors
-        neigh_arr.count {|arr| arr.is_a?(Bomb)}
+        bomb_count = neigh_arr.count {|arr| arr.is_a?(Bomb)}
+        bomb_count
     end
 
     def to_s
@@ -54,5 +79,8 @@ class Tile
 
     def inspect
         {'value'=> @value, 'pos'=> @pos, 'revealed'=> @revealed, 'flagged'=> @flagged}
+    end
+
+    def exploded?
     end
 end
