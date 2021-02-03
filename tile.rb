@@ -2,7 +2,7 @@ require_relative "./bomb.rb"
 require "byebug"
 
 class Tile
-    attr_accessor :nearby_bombs, :value
+    attr_accessor :value
     def initialize(pos, board)
         @board = board
         @pos = pos
